@@ -1,56 +1,183 @@
-# YieldX Staking dApp
+# ◈ ArtVault — NFT Marketplace
 
-This project is a decentralized staking platform built with Solidity, Hardhat, React, ethers.js, and Tailwind CSS. Users can stake SRT (Staking Rewards Token), earn yield over time, and claim their rewards seamlessly via the web interface.
+![Solidity](https://img.shields.io/badge/Solidity-0.8.20-363636?style=flat&logo=solidity)
+![Hardhat](https://img.shields.io/badge/Hardhat-2.x-yellow?style=flat)
+![React](https://img.shields.io/badge/React-19-61DAFB?style=flat&logo=react)
+![ethers.js](https://img.shields.io/badge/ethers.js-v5-purple?style=flat)
 
-## Project Structure
+A fully functional NFT marketplace where users can mint NFTs, list them for sale, and buy listed NFTs using ETH. Ownership transfers automatically on purchase.
 
-- `contracts/`: Contains the Solidity smart contracts.
-  - `TestToken.sol`: The ERC20 token used for staking and rewards (SRT).
-  - `defi_stakingapp.sol`: The core staking contract logic (`DeFiStakingApp`).
-- `test/DeFiStakingApp.test.ts`: Comprehensive tests covering all core mechanics.
-- `scripts/deployStaking.ts`: Deployment script that pushes contracts and saves ABIs for the frontend.
-- `frontend/`: The React + Vite frontend application.
-  - `src/hooks/useStaking.js`: Hook managing blockchain interactions via `ethers.js`.
-  - `src/App.jsx`: Main UI dashboard for interacting with the staking contract.
+---
 
-## Local Setup & Testing Instructions
+## 🎯 Key Features
 
-Follow these steps to deploy the contracts on a local Hardhat network and run the web application.
+- 🎨 **Mint NFTs** — with name, description, and image (URL or file upload)
+- 🏷️ **List for sale** — set your own ETH price
+- 🛒 **Buy NFTs** — pay ETH, ownership transfers instantly
+- ❌ **Cancel listing** — delist anytime before sale
+- 💰 **Withdraw proceeds** — sellers pull their ETH after a sale
+- 🔄 **Auto reconnect** — wallet stays connected on page reload
+- 🔌 **Disconnect** — logout button in header
 
-### 1. Start Local Blockchain
-Open a new terminal at the root of the project (`/Users/hemanth/Desktop/Blockchain`) and run:
+---
+
+## 🏗️ Smart Contracts
+
+| Contract | Description |
+|---|---|
+| `ArtNFT.sol` | ERC-721 token — mint NFTs with metadata URI |
+| `NFTMarketplace.sol` | List, buy, cancel, withdraw proceeds — 2.5% platform fee |
+
+### Security
+
+- ✅ ReentrancyGuard on all value-transferring functions
+- ✅ CEI pattern — listing deleted before NFT transfer
+- ✅ Ownable access control on admin functions
+- ✅ Pull pattern for proceeds — sellers withdraw manually
+- ✅ Auto-approval of marketplace via isApprovedForAll override
+
+---
+
+## 📁 Project Structure
+```
+├── contracts/
+│   ├── ArtNFT.sol              # ERC-721 NFT contract
+│   └── NFTMarketplace.sol      # Marketplace logic
+├── scripts/
+│   └── deployNFT.js            # Deploys both contracts and saves ABIs
+├── test/
+│   └── NFTMarketplace.test.ts  # 5 test cases
+├── frontend/
+│   └── src/
+│       ├── NFTApp.jsx          # Main UI — mint, my nfts, marketplace tabs
+│       └── abis/
+│           ├── ArtNFT.json
+│           └── NFTMarketplace.json
+├── hardhat.config.ts
+└── README.md
+```
+
+---
+
+## 💻 Local Setup
+
+### Prerequisites
+
+- Node.js 18+
+- MetaMask browser extension
+- Git
+
+### Step 1 — Clone the repository
+```bash
+git clone https://github.com/Hemanth-310/nft-marketplace.git
+cd nft-marketplace
+```
+
+### Step 2 — Install contract dependencies
+```bash
+npm install
+```
+
+### Step 3 — Install frontend dependencies
+```bash
+cd frontend
+npm install
+cd ..
+```
+
+### Step 4 — Create a .env file
+```
+PRIVATE_KEY=your_wallet_private_key
+SEPOLIA_RPC_URL=your_rpc_url
+ETHERSCAN_API_KEY=your_etherscan_key
+```
+
+---
+
+## 🚀 Running Locally
+
+### Terminal 1 — Start local blockchain
 ```bash
 npx hardhat node
 ```
-*This starts a local Ethereum node at `http://127.0.0.1:8545`.*
 
-### 2. Deploy Contracts
-In a second terminal, execute the deployment script to deploy the contracts to your local node:
+### Terminal 2 — Deploy contracts
 ```bash
-npx hardhat run scripts/deployStaking.ts --network localhost
+npx hardhat run scripts/deployNFT.js --network localhost
 ```
-*This will automatically generate the required `addresses.json` and ABIs in the `frontend/src/contracts` folder.*
 
-### 3. Run the Frontend
-Navigate to the frontend folder and run the development server:
+### Terminal 3 — Start frontend
 ```bash
 cd frontend
 npm run dev
 ```
 
-### 4. Connect MetaMask
-1. Open MetaMask in your browser.
-2. Add a Custom Network:
-   - **Network Name**: Hardhat Local
-   - **RPC URL**: `http://127.0.0.1:8545`
-   - **Chain ID**: 31337 (or 1337 depending on Hardhat config)
-   - **Currency Symbol**: ETH
-3. Import an Account using one of the private keys provided by the `npx hardhat node` terminal output.
-4. Click **Connect Wallet** on the frontend dashboard!
+Open http://localhost:5173
 
-## Usage Guide
-1. **Mint Tokens**: Click "Mint 1,000 SRT" to receive test tokens.
-2. **Stake**: Enter an amount and click "Stake Now" to deposit SRT into the staking pool.
-3. **Earn**: Watch your "Pending Rewards" accrue in real-time.
-4. **Claim**: Click "Claim Rewards" to transfer accumulated SRT yield to your wallet.
-5. **Unstake**: Withdraw your originally staked SRT back to your wallet.
+---
+
+## 🦊 MetaMask Setup
+
+| Field | Value |
+|---|---|
+| Network Name | Hardhat Local |
+| RPC URL | http://127.0.0.1:8545 |
+| Chain ID | 1337 |
+| Currency Symbol | ETH |
+
+Import Account #0 private key:
+```
+0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80
+```
+
+---
+
+## 🧪 Tests
+```bash
+npx hardhat test test/NFTMarketplace.test.ts
+```
+
+Expected output:
+```
+NFT Marketplace
+  ✔ should let a user mint an NFT and become the owner
+  ✔ should let the owner list an NFT for sale
+  ✔ should transfer NFT to buyer and credit seller proceeds
+  ✔ should revert if buyer sends wrong ETH amount
+  ✔ should let seller withdraw their proceeds
+
+5 passing
+```
+
+---
+
+## 🌐 Deploy to Sepolia
+```bash
+npx hardhat run scripts/deployNFT.js --network sepolia
+```
+
+---
+
+## 📦 Tech Stack
+
+| Layer | Technology |
+|---|---|
+| Smart Contracts | Solidity 0.8.20 |
+| Standards | OpenZeppelin ERC-721 |
+| Framework | Hardhat |
+| Frontend | React 19 + Vite |
+| Blockchain Interaction | ethers.js v5 |
+| Styling | Tailwind CSS |
+| Wallet | MetaMask |
+
+---
+
+## 👥 Author
+
+**Hemanth E B**
+
+---
+
+## 📄 License
+
+MIT License
